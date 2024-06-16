@@ -1,0 +1,65 @@
+openapi: 3.0.0
+paths:
+  /products/:
+    get:
+      operationId: getProducts
+      summary: Get all products
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+      tags:
+        - Products
+  /products/{id}:
+    get:
+      operationId: getProductsById
+      summary: Get single product by id
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: The ID of the product
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+      tags:
+        - Products
+info:
+  title: ''
+  version: 1.0.0
+  contact: {}
+tags: []
+servers:
+  - url: https://604gqbct0j.execute-api.us-west-1.amazonaws.com/prod/
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 0
+      required:
+        - id
+        - title
+        - price
