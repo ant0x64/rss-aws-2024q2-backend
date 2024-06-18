@@ -3,10 +3,23 @@ import { Construct } from "constructs";
 
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 
 export class AppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    const productsTable = new dynamodb.Table(this, "RSS-Back-Dynamo-ProductsTable", {
+      partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
+      tableName: "products",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const stocksTable = new dynamodb.Table(this, "RSS-Back-Dynamo-StocksTable", {
+      partitionKey: { name: "product_id", type: dynamodb.AttributeType.STRING },
+      tableName: "stocks",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
 
     const getProductsLambda = new lambda.Function(
       this,
@@ -15,6 +28,9 @@ export class AppStack extends cdk.Stack {
         runtime: lambda.Runtime.NODEJS_20_X,
         code: lambda.Code.fromAsset("dist/lambda/products"),
         handler: "get-list.getProductsList",
+        environment: {
+          PRODUCTS_TABLE: productsTable.tableName,
+        },
       }
     );
 
@@ -25,8 +41,14 @@ export class AppStack extends cdk.Stack {
         runtime: lambda.Runtime.NODEJS_20_X,
         code: lambda.Code.fromAsset("dist/lambda/products"),
         handler: "get-by-id.getProductsById",
+        environment: {
+          PRODUCTS_TABLE: productsTable.tableName,
+        },
       }
     );
+
+    productsTable.grantReadData(getProductsLambda);
+    productsTable.grantReadData(getProductsByIdLambda);
 
     const api = new apigateway.RestApi(this, "ProductsApi", {
       restApiName: "Products Service",
@@ -60,7 +82,7 @@ export class AppStack extends cdk.Stack {
     //   stageName: "dev",
     //   deployment: deployment,
     //   variables: {
-    //     environment: "dev", 
+    //     environment: "dev",
     //   },
     // });
 
