@@ -1,5 +1,5 @@
 import { getProductsById } from "~/lambda/products/get-by-id";
-import productService from "~/services/repositories/product";
+import productService from "~/services/db/product";
 
 import { baseEvent, baseContext } from "./utils";
 

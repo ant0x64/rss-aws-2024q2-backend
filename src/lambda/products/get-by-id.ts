@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 
-import productService from '~/services/repositories/product';
+import productService from '~/services/db/product';
 
 export const getProductsById: APIGatewayProxyHandler = async (event) => {
   const product = await productService.getById(event.pathParameters?.id || "");

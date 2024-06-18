@@ -5,7 +5,7 @@
     "app": "bin/app.js"
   },
   "scripts": {
-    "build": "ts-node bin/build.ts",
+    "build": "ts-node bin/build.lambda.ts",
     "test": "jest",
     "deploy": "npm run build && cdk deploy",
     "destroy": "cdk destroy"

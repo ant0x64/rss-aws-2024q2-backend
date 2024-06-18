@@ -2,10 +2,10 @@ import * as esbuild from "esbuild";
 
 // @ts-ignore
 esbuild.build({
-  entryPoints: ["./lambda/**"],
+  entryPoints: ["./src/lambda/**"],
   bundle: true,
   outdir: "dist",
-  outbase: "./",
+  outbase: "./src/",
   platform: "node",
   target: "node20",
   format: "cjs",
