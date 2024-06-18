@@ -9,17 +9,28 @@ export class AppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const productsTable = new dynamodb.Table(this, "RSS-Back-Dynamo-ProductsTable", {
-      partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
-      tableName: "products",
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
+    const productsTable = new dynamodb.Table(
+      this,
+      "RSS-Back-Dynamo-ProductsTable",
+      {
+        partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
+        tableName: "products",
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }
+    );
 
-    const stocksTable = new dynamodb.Table(this, "RSS-Back-Dynamo-StocksTable", {
-      partitionKey: { name: "product_id", type: dynamodb.AttributeType.STRING },
-      tableName: "stocks",
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
+    const stocksTable = new dynamodb.Table(
+      this,
+      "RSS-Back-Dynamo-StocksTable",
+      {
+        partitionKey: {
+          name: "product_id",
+          type: dynamodb.AttributeType.STRING,
+        },
+        tableName: "stocks",
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }
+    );
 
     const getProductsLambda = new lambda.Function(
       this,
@@ -47,8 +58,22 @@ export class AppStack extends cdk.Stack {
       }
     );
 
+    const postProductsLambda = new lambda.Function(
+      this,
+      "RSS-Back-Lambda-postProducts",
+      {
+        runtime: lambda.Runtime.NODEJS_20_X,
+        code: lambda.Code.fromAsset("dist/lambda/products"),
+        handler: "post.postProducts",
+        environment: {
+          PRODUCTS_TABLE: productsTable.tableName,
+        },
+      }
+    );
+
     productsTable.grantReadData(getProductsLambda);
     productsTable.grantReadData(getProductsByIdLambda);
+    productsTable.grantWriteData(postProductsLambda);
 
     const api = new apigateway.RestApi(this, "ProductsApi", {
       restApiName: "Products Service",
@@ -64,15 +89,19 @@ export class AppStack extends cdk.Stack {
     const products = api.root.addResource("products");
     const singleProduct = products.addResource("{id}");
 
-    const getAllIntegration = new apigateway.LambdaIntegration(
-      getProductsLambda
+    products.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(getProductsLambda)
     );
-    const getByIdIntegration = new apigateway.LambdaIntegration(
-      getProductsByIdLambda
+    products.addMethod(
+      "POST",
+      new apigateway.LambdaIntegration(postProductsLambda)
     );
 
-    products.addMethod("GET", getAllIntegration);
-    singleProduct.addMethod("GET", getByIdIntegration);
+    singleProduct.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(getProductsByIdLambda)
+    );
 
     // const deployment = new apigateway.Deployment(this, "MyDeployment", {
     //   api,

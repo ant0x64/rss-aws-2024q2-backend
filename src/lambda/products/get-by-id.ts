@@ -1,25 +1,22 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
+import { createResponse } from "~/utils/lambda";
 
 import productService from '~/services/db/product';
 
 export const getProductsById: APIGatewayProxyHandler = async (event) => {
-  const product = await productService.getById(event.pathParameters?.id || "");
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "*",
-  };
   
-  if (!product) {
-    return {
-      statusCode: 404,
-      headers,
-      body: JSON.stringify({ message: 'Product not found' }),
-    };
-  }
+  try {
+    const product = await productService.getById(event.pathParameters?.id || "");
 
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify(product),
-  };
+    if (!product) {
+      return createResponse(404, { message: 'Product not found' });
+    }
+
+    return createResponse(200, product);;
+    
+  } catch (e) {
+    console.error(e);
+    return createResponse(500, {'message': 'Internal Error'});
+  }
+  
 };

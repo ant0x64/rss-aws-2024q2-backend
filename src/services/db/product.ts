@@ -1,5 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { randomBytes } from "crypto";
 
 interface ProductInterface {
   id: string;
@@ -36,7 +37,7 @@ class ProductService {
 
   async getList(): Promise<ProductInterface[]> {
     const result = await dc.send(new ScanCommand(this.defaultParams));
-    return result.Items || [];
+    return result.Items as ProductInterface[] || [];
   }
 
   async getById(id: ProductInterface['id']): Promise<ProductInterface | undefined> {
@@ -45,7 +46,7 @@ class ProductService {
   }
 
   async putItem(product: ProductInterface): Promise<ProductInterface | false> {
-    await dc.send(new PutCommand({...this.defaultParams, Item: product}));
+    await dc.send(new PutCommand({...this.defaultParams, Item: { ...product, id: randomBytes(32).toString('hex')}}));
     return product;
   }
 }
