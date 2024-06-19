@@ -117,6 +117,13 @@ export class AppStack extends cdk.Stack {
 
     // api.deploymentStage = devStage;
 
+    new cdk.CfnOutput(this, 'Table-Products-Name', {
+      value: productsTable.tableName,
+      exportName: 'RSS-Back-Table-Products-Name',
+    });
+
+    cdk.CfnOutput
+
     new cdk.CfnOutput(this, "RSS-Back-API-URL", {
       value: api.url,
     });
