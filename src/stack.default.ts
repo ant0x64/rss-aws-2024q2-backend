@@ -15,7 +15,7 @@ export class AppStack extends cdk.Stack {
       {
         partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
         tableName: "products",
-        removalPolicy: cdk.RemovalPolicy.DESTROY,
+        removalPolicy: cdk.RemovalPolicy.DESTROY
       }
     );
 
@@ -41,6 +41,7 @@ export class AppStack extends cdk.Stack {
         handler: "get-list.getProductsList",
         environment: {
           PRODUCTS_TABLE: productsTable.tableName,
+          STOCK_TABLE: stocksTable.tableName,
         },
       }
     );
@@ -54,6 +55,7 @@ export class AppStack extends cdk.Stack {
         handler: "get-by-id.getProductsById",
         environment: {
           PRODUCTS_TABLE: productsTable.tableName,
+          STOCK_TABLE: stocksTable.tableName,
         },
       }
     );
@@ -67,6 +69,7 @@ export class AppStack extends cdk.Stack {
         handler: "post.postProducts",
         environment: {
           PRODUCTS_TABLE: productsTable.tableName,
+          STOCK_TABLE: stocksTable.tableName,
         },
       }
     );
@@ -74,6 +77,9 @@ export class AppStack extends cdk.Stack {
     productsTable.grantReadData(getProductsLambda);
     productsTable.grantReadData(getProductsByIdLambda);
     productsTable.grantWriteData(postProductsLambda);
+    stocksTable.grantReadData(getProductsLambda);
+    stocksTable.grantReadData(getProductsByIdLambda);
+    stocksTable.grantWriteData(postProductsLambda);
 
     const api = new apigateway.RestApi(this, "ProductsApi", {
       restApiName: "Products Service",
