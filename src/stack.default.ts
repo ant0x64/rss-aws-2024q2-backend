@@ -5,17 +5,20 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 
+import { productStockDto } from "./models/products";
+
 export class AppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // CREATE TABLES
     const productsTable = new dynamodb.Table(
       this,
       "RSS-Back-Dynamo-ProductsTable",
       {
         partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
         tableName: "products",
-        removalPolicy: cdk.RemovalPolicy.DESTROY
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
       }
     );
 
@@ -32,6 +35,7 @@ export class AppStack extends cdk.Stack {
       }
     );
 
+    // LAMBDAS
     const getProductsLambda = new lambda.Function(
       this,
       "RSS-Back-Lambda-getProductsList",
@@ -81,6 +85,7 @@ export class AppStack extends cdk.Stack {
     stocksTable.grantReadData(getProductsByIdLambda);
     stocksTable.grantWriteData(postProductsLambda);
 
+    // GATEWAY
     const api = new apigateway.RestApi(this, "ProductsApi", {
       restApiName: "Products Service",
       description: "This service serves products.",
@@ -99,9 +104,27 @@ export class AppStack extends cdk.Stack {
       "GET",
       new apigateway.LambdaIntegration(getProductsLambda)
     );
+
     products.addMethod(
       "POST",
-      new apigateway.LambdaIntegration(postProductsLambda)
+      new apigateway.LambdaIntegration(postProductsLambda),
+      {
+        requestValidator: new apigateway.RequestValidator(
+          this,
+          "RequestValidator",
+          {
+            restApi: api,
+            validateRequestBody: true,
+          }
+        ),
+        requestModels: {
+          "application/json": new apigateway.Model(this, "ProductsModel", {
+            restApi: api,
+            contentType: "application/json",
+            schema: productStockDto,
+          }),
+        },
+      }
     );
 
     singleProduct.addMethod(
@@ -109,26 +132,11 @@ export class AppStack extends cdk.Stack {
       new apigateway.LambdaIntegration(getProductsByIdLambda)
     );
 
-    // const deployment = new apigateway.Deployment(this, "MyDeployment", {
-    //   api,
-    // });
-
-    // const devStage = new apigateway.Stage(this, "DevStage", {
-    //   stageName: "dev",
-    //   deployment: deployment,
-    //   variables: {
-    //     environment: "dev",
-    //   },
-    // });
-
-    // api.deploymentStage = devStage;
-
-    new cdk.CfnOutput(this, 'Table-Products-Name', {
+    // OUTPUT
+    new cdk.CfnOutput(this, "Table-Products-Name", {
       value: productsTable.tableName,
-      exportName: 'RSS-Back-Table-Products-Name',
+      exportName: "RSS-Back-Table-Products-Name",
     });
-
-    cdk.CfnOutput
 
     new cdk.CfnOutput(this, "RSS-Back-API-URL", {
       value: api.url,

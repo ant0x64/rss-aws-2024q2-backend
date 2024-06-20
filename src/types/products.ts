@@ -11,3 +11,15 @@ export interface StockInterface {
 }
 
 export interface ProductStockInterface extends ProductInterface, Omit<StockInterface, 'product_id'> {}
+
+export class Product implements ProductInterface {
+  title: string;
+  description?: string;
+  price: number;
+  id: string;
+}
+
+export class ProductStock implements StockInterface {
+  product_id: ProductInterface['id'];
+  count: number;
+}
