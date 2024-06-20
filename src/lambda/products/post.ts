@@ -5,7 +5,7 @@ import productService from '~/services/db/product';
 
 export const postProducts: APIGatewayProxyHandler = async (event) => {
 
-  console.log('Received event:', JSON.stringify(event, null, 2));
+  console.log('Received event: ', JSON.stringify(event, null, 2));
 
   try {
     const productData = event.body? JSON.parse(event.body) : event;

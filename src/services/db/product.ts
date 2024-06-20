@@ -63,7 +63,7 @@ class ProductService {
     const { Item: stock } = await dc.send(
       new GetCommand({
         TableName: this.defaultParams.StocksTableName,
-        Key: { id },
+        Key: { product_id: id },
       })
     );
 

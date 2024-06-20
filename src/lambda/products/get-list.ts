@@ -3,7 +3,8 @@ import { createResponse } from "~/utils/lambda";
 
 import productService from '~/services/db/product';
 
-export const getProductsList: APIGatewayProxyHandler = async () => {
+export const getProductsList: APIGatewayProxyHandler = async (event) => {
+  console.log('Received event: ', JSON.stringify(event, null, 2));
   try {
     return createResponse(200, await productService.getList());
   } catch {
