@@ -11,6 +11,7 @@ describe("Lambda: getProductsList", () => {
       price: 10,
       title: "title",
       description: "description",
+      count: 1,
     }]));
 
     const response = await getProductsList(
