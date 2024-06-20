@@ -3,8 +3,7 @@ import {
   DynamoDBDocumentClient,
   ScanCommand,
   GetCommand,
-  PutCommand,
-  DeleteCommand,
+  TransactWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "crypto";
 
@@ -78,32 +77,24 @@ class ProductService {
     const product: ProductInterface = { ...productStock, id };
     const stock: StockInterface = { ...productStock, product_id: id };
 
-    console.log('Putting the product: ' + JSON.stringify(product));
-    await dc.send(
-      new PutCommand({
-        TableName: this.defaultParams.ProductsTableName,
-        Item: product,
-      })
-    );
+    const transaction = new TransactWriteCommand({
+      TransactItems: [
+        {
+          Put: {
+            TableName: this.defaultParams.ProductsTableName,
+            Item: product,
+          },
+        },
+        {
+          Put: {
+            TableName: this.defaultParams.StocksTableName,
+            Item: stock,
+          },
+        },
+      ],
+    });
 
-    try {
-      console.log('Putting the stock: ' + JSON.stringify(stock));
-      await dc.send(
-        new PutCommand({
-          TableName: this.defaultParams.StocksTableName,
-          Item: stock,
-        })
-      );
-    } catch (e) {
-      console.log('Stock putting failed. Deleting the product');
-      await dc.send(
-        new DeleteCommand({
-          TableName: this.defaultParams.ProductsTableName,
-          Key: { id: product.id },
-        })
-      );
-      throw e;
-    }
+    dc.send(transaction);
 
     return { ...productStock, id };
   }
