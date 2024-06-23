@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyEvent, Context } from "aws-lambda";
 
 export const baseEvent = {
   pathParameters: {},
@@ -38,11 +38,10 @@ export const baseEvent = {
       sourceIp: "",
       user: null,
       userAgent: null,
-      userArn: null
-    }
+      userArn: null,
+    },
   },
-  resource: ""
+  resource: "",
 } as APIGatewayProxyEvent;
 
-export const baseContext = {
-} as Context;
+export const baseContext = {} as Context;

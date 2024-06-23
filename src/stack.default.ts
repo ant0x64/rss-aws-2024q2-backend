@@ -19,7 +19,7 @@ export default class AppStack extends cdk.Stack {
         partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
         tableName: "products",
         removalPolicy: cdk.RemovalPolicy.DESTROY,
-      }
+      },
     );
 
     const stocksTable = new dynamodb.Table(
@@ -32,7 +32,7 @@ export default class AppStack extends cdk.Stack {
         },
         tableName: "stocks",
         removalPolicy: cdk.RemovalPolicy.DESTROY,
-      }
+      },
     );
 
     // LAMBDAS
@@ -47,7 +47,7 @@ export default class AppStack extends cdk.Stack {
           PRODUCTS_TABLE: productsTable.tableName,
           STOCK_TABLE: stocksTable.tableName,
         },
-      }
+      },
     );
 
     const getProductsByIdLambda = new lambda.Function(
@@ -61,7 +61,7 @@ export default class AppStack extends cdk.Stack {
           PRODUCTS_TABLE: productsTable.tableName,
           STOCK_TABLE: stocksTable.tableName,
         },
-      }
+      },
     );
 
     const postProductsLambda = new lambda.Function(
@@ -75,7 +75,7 @@ export default class AppStack extends cdk.Stack {
           PRODUCTS_TABLE: productsTable.tableName,
           STOCK_TABLE: stocksTable.tableName,
         },
-      }
+      },
     );
 
     productsTable.grantReadData(getProductsLambda);
@@ -102,7 +102,7 @@ export default class AppStack extends cdk.Stack {
 
     products.addMethod(
       "GET",
-      new apigateway.LambdaIntegration(getProductsLambda)
+      new apigateway.LambdaIntegration(getProductsLambda),
     );
 
     products.addMethod(
@@ -115,7 +115,7 @@ export default class AppStack extends cdk.Stack {
           {
             restApi: api,
             validateRequestBody: true,
-          }
+          },
         ),
         requestModels: {
           "application/json": new apigateway.Model(this, "ProductsModel", {
@@ -124,12 +124,12 @@ export default class AppStack extends cdk.Stack {
             schema: productStockDto,
           }),
         },
-      }
+      },
     );
 
     singleProduct.addMethod(
       "GET",
-      new apigateway.LambdaIntegration(getProductsByIdLambda)
+      new apigateway.LambdaIntegration(getProductsByIdLambda),
     );
 
     // OUTPUT

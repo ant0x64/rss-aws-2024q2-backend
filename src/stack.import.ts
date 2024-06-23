@@ -28,7 +28,7 @@ export default class ImportStack extends cdk.Stack {
           BUCKET_IMPORT_NAME: bucket.bucketName,
           BUCKET_IMPORT_UPLOADED_NAME: "uploaded",
         },
-      }
+      },
     );
 
     //bucket.grantPut(lambdaImport);
@@ -36,7 +36,7 @@ export default class ImportStack extends cdk.Stack {
       new iam.PolicyStatement({
         actions: ["s3:Put*", "s3:Get*"],
         resources: [bucket.bucketArn + "/uploaded/*"],
-      })
+      }),
     );
 
     // API
@@ -52,7 +52,7 @@ export default class ImportStack extends cdk.Stack {
         requestParameters: {
           "method.request.querystring.name": true,
         },
-      }
+      },
     );
   }
 }

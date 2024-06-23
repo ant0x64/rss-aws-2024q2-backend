@@ -31,5 +31,6 @@
     "node_modules",
     "cdk.out",
     "dist"
-  ]
+  ],
+  "include": ["bin", "src", "scripts", "test"],
 }

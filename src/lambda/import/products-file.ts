@@ -1,7 +1,11 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { createResponse } from "~/utils/lambda";
 
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const importProductsFile: APIGatewayProxyHandler = async (event) => {
@@ -11,7 +15,7 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
     const file_name = event.queryStringParameters?.name;
 
     if (!file_name) {
-      return createResponse(400, { message: "File name not specified"  });
+      return createResponse(400, { message: "File name not specified" });
     }
 
     const bucket_name = process.env.BUCKET_IMPORT_NAME;
@@ -29,7 +33,7 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
         Bucket: bucket_name,
         Key: `${uploaded_key}/${file_name}`,
       }),
-      { expiresIn: 3600 }
+      { expiresIn: 3600 },
     );
 
     const get = await getSignedUrl(
@@ -38,7 +42,7 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
         Bucket: bucket_name,
         Key: `${uploaded_key}/${file_name}`,
       }),
-      { expiresIn: 3600 }
+      { expiresIn: 3600 },
     );
 
     return createResponse(200, { put, get });

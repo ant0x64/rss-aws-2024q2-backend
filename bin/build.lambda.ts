@@ -1,6 +1,5 @@
 import * as esbuild from "esbuild";
 
-// @ts-ignore
 esbuild.build({
   entryPoints: ["./src/lambda/**"],
   bundle: true,

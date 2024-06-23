@@ -24,10 +24,10 @@ class ProductService {
 
   async getList(): Promise<ProductStockInterface[]> {
     const { Items: products } = await dc.send(
-      new ScanCommand({ TableName: this.defaultParams.ProductsTableName })
+      new ScanCommand({ TableName: this.defaultParams.ProductsTableName }),
     );
     const { Items: stocks } = await dc.send(
-      new ScanCommand({ TableName: this.defaultParams.StocksTableName })
+      new ScanCommand({ TableName: this.defaultParams.StocksTableName }),
     );
 
     const stocksMap = new Map<StockInterface["product_id"], StockInterface>();
@@ -46,13 +46,13 @@ class ProductService {
   }
 
   async getById(
-    id: ProductInterface["id"]
+    id: ProductInterface["id"],
   ): Promise<ProductStockInterface | undefined> {
     const { Item: product } = await dc.send(
       new GetCommand({
         TableName: this.defaultParams.ProductsTableName,
         Key: { id },
-      })
+      }),
     );
 
     if (!product) {
@@ -63,14 +63,14 @@ class ProductService {
       new GetCommand({
         TableName: this.defaultParams.StocksTableName,
         Key: { product_id: id },
-      })
+      }),
     );
 
     return { ...(product as ProductInterface), count: stock?.count || 0 };
   }
 
   async putItem(
-    productStock: ProductStockInterface
+    productStock: ProductStockInterface,
   ): Promise<ProductInterface | false> {
     const id = randomUUID();
 

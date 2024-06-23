@@ -6,11 +6,13 @@ export interface ProductInterface {
 }
 
 export interface StockInterface {
-  product_id: ProductInterface['id'];
+  product_id: ProductInterface["id"];
   count: number;
 }
 
-export interface ProductStockInterface extends ProductInterface, Omit<StockInterface, 'product_id'> {}
+export interface ProductStockInterface
+  extends ProductInterface,
+    Omit<StockInterface, "product_id"> {}
 
 export class Product implements ProductInterface {
   title: string;
@@ -20,6 +22,6 @@ export class Product implements ProductInterface {
 }
 
 export class ProductStock implements StockInterface {
-  product_id: ProductInterface['id'];
+  product_id: ProductInterface["id"];
   count: number;
 }
