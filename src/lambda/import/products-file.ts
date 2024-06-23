@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { createResponse } from "~/utils/lambda";
 
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const importProductsFile: APIGatewayProxyHandler = async (event) => {
@@ -11,7 +11,7 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
     const file_name = event.queryStringParameters?.name;
 
     if (!file_name) {
-      return createResponse(400, { message: "File name not specified" });
+      return createResponse(400, { message: "File name not specified"  });
     }
 
     const bucket_name = process.env.BUCKET_IMPORT_NAME;
@@ -21,8 +21,10 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
       return createResponse(500, { message: "Bad configuration" });
     }
 
-    const url = getSignedUrl(
-      new S3Client(),
+    const client = new S3Client();
+
+    const put = await getSignedUrl(
+      client,
       new PutObjectCommand({
         Bucket: bucket_name,
         Key: `${uploaded_key}/${file_name}`,
@@ -30,7 +32,16 @@ export const importProductsFile: APIGatewayProxyHandler = async (event) => {
       { expiresIn: 3600 }
     );
 
-    return createResponse(200, { url });
+    const get = await getSignedUrl(
+      client,
+      new GetObjectCommand({
+        Bucket: bucket_name,
+        Key: `${uploaded_key}/${file_name}`,
+      }),
+      { expiresIn: 3600 }
+    );
+
+    return createResponse(200, { put, get });
   } catch (e) {
     return createResponse(500);
   }

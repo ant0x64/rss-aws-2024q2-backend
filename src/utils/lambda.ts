@@ -6,6 +6,7 @@ export const createResponse = (status: number = 200, body = {}): APIGatewayProxy
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "*",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
   };

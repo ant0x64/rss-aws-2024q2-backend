@@ -23,7 +23,7 @@ export default class ImportStack extends cdk.Stack {
       {
         runtime: lambda.Runtime.NODEJS_20_X,
         code: lambda.Code.fromAsset("dist/lambda/import"),
-        handler: "product-file.importProductsFile",
+        handler: "products-file.importProductsFile",
         environment: {
           BUCKET_IMPORT_NAME: bucket.bucketName,
           BUCKET_IMPORT_UPLOADED_NAME: "uploaded",
@@ -31,9 +31,10 @@ export default class ImportStack extends cdk.Stack {
       }
     );
 
+    //bucket.grantPut(lambdaImport);
     lambdaImport.addToRolePolicy(
       new iam.PolicyStatement({
-        actions: ["s3:PutObject"],
+        actions: ["s3:Put*", "s3:Get*"],
         resources: [bucket.bucketArn + "/uploaded/*"],
       })
     );
@@ -41,11 +42,6 @@ export default class ImportStack extends cdk.Stack {
     // API
     const api = new apigateway.RestApi(this, "Api-Import", {
       restApiName: "Import Service",
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
-      },
     });
     const importResource = api.root.addResource("import");
 
@@ -54,7 +50,7 @@ export default class ImportStack extends cdk.Stack {
       new apigateway.LambdaIntegration(lambdaImport),
       {
         requestParameters: {
-          name: true,
+          "method.request.querystring.name": true,
         },
       }
     );
