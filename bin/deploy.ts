@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { AppStack } from '../lib/app-stack';
+import { AppStack } from '../src/stack.default';
 
 const app = new cdk.App();
-new AppStack(app, 'RSS-Back', {
-  stackName: 'RSS-Backend-Stack'
+new AppStack(app, 'RSS-Back-Task4', {
+  stackName: 'RSS-Backend-Task4'
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

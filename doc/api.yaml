@@ -16,6 +16,28 @@ paths:
                   $ref: '#/components/schemas/Product'
       tags:
         - Products
+    post:
+      operationId: postProduct
+      summary: Create product
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: The product has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Does not fit required schema
+      tags:
+        - Products
+
   /products/{id}:
     get:
       operationId: getProductsById
@@ -44,7 +66,7 @@ info:
   contact: {}
 tags: []
 servers:
-  - url: https://604gqbct0j.execute-api.us-west-1.amazonaws.com/prod/
+  - url: https://a7tw6s41tb.execute-api.us-west-1.amazonaws.com/prod/
 components:
   schemas:
     Product:
@@ -59,7 +81,10 @@ components:
         price:
           type: number
           minimum: 0
+        count:
+          type: number
+          minimum: 0
       required:
-        - id
         - title
         - price
+        - count

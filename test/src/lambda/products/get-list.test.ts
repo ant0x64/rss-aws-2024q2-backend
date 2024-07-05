@@ -1,5 +1,5 @@
 import { getProductsList } from "~/lambda/products/get-list";
-import productService from "~/services/repositories/product";
+import productService from "~/services/db/product";
 
 import { baseEvent, baseContext } from "./utils";
 
@@ -11,6 +11,7 @@ describe("Lambda: getProductsList", () => {
       price: 10,
       title: "title",
       description: "description",
+      count: 1,
     }]));
 
     const response = await getProductsList(
